@@ -13,9 +13,9 @@ def begin():
 	curses.noecho()
 	while running:
 		screen.clear()
-		screen.addstr(2,2,wordl.get_word(0))
-		screen.addstr(3,2,wordl.get_word(1))
-		screen.addstr(4,2,buff.get_string())
+		screen.addstr(2, 2, wordl.get_word(1))
+		screen.addstr(3, 2, wordl.get_word(0))
+		screen.addstr(3, 2, buff.get_string(),curses.A_BOLD)
 		screen.refresh()
 		prompt()
 	quit()
@@ -32,10 +32,17 @@ def prompt():
 		buff.clear()
 	elif key >= 97 and key <= 122: # 'a' - 'z'
 		buff.add(chr(key))
+		check()
 	elif key >= 65 and key <= 90: # 'A' - 'Z'
 		buff.add(chr(key))
+		check()
 	else:
 		pass
+
+def check():
+	if buff.get_string() == wordl.get_word(0):
+		wordl.cycle()
+		buff.clear()
 
 def quit():
 	"""Cleans up and exits."""

@@ -1,12 +1,15 @@
 class BuffInput:
 	""" An unbuffered input string reference object for the player. """
-	player_input = ""
+	buff = ""
 
-	def add(c):
-		player_input + c
+	def __init__(self):
+		pass
 
-	def clear():
-		player_input = ""
+	def add(self, c):
+		self.buff += c
 
-	def get():
-		return player_input
+	def clear(self):
+		self.buff = ""
+
+	def get_string(self):
+		return self.buff

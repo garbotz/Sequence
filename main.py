@@ -1,8 +1,10 @@
 import curses
 from lib import buffinput
+from lib import wordlist
 
 screen = curses.initscr()
 buff = buffinput.BuffInput()
+wordl = wordlist.WordList()
 running = True
 
 def begin():
@@ -11,8 +13,8 @@ def begin():
 	curses.noecho()
 	while running:
 		screen.clear()
-		screen.addstr(2,2,"Word1")
-		screen.addstr(3,2,"Word1")
+		screen.addstr(2,2,wordl.get_word(0))
+		screen.addstr(3,2,wordl.get_word(1))
 		screen.addstr(4,2,buff.get_string())
 		screen.refresh()
 		prompt()

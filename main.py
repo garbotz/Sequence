@@ -13,9 +13,18 @@ def begin():
 	curses.noecho()
 	while running:
 		screen.clear()
-		screen.addstr(2, 2, wordl.get_word(1))
-		screen.addstr(3, 2, wordl.get_word(0))
-		screen.addstr(3, 2, buff.get_string(),curses.A_BOLD)
+		
+		if wordl.get_word(1).get_special():
+			screen.addstr(2, 2, wordl.get_word(1).get_string(), curses.A_REVERSE)
+		else:
+			screen.addstr(2, 2, wordl.get_word(1).get_string())
+			
+		if wordl.get_word(0).get_special():
+			screen.addstr(3, 2, wordl.get_word(0).get_string(), curses.A_STANDOUT)
+		else:
+			screen.addstr(3, 2, wordl.get_word(0).get_string())
+
+		screen.addstr(3, 2, buff.get_string(),curses.A_UNDERLINE)
 		screen.refresh()
 		prompt()
 	quit()
@@ -27,7 +36,11 @@ def prompt():
 	if   key == 27:   # escape
 		running = False
 	elif key == 32: # space
-		pass
+		if wordl.get_word(0).get_special():
+			pass
+		wordl.cycle()			
+		buff.clear()
+
 	elif key == 8 or key == 127: # bs, del
 		buff.clear()
 	elif key >= 97 and key <= 122: # 'a' - 'z'
@@ -40,7 +53,7 @@ def prompt():
 		pass
 
 def check():
-	if buff.get_string() == wordl.get_word(0):
+	if buff.get_string() == wordl.get_word(0).get_string():
 		wordl.cycle()
 		buff.clear()
 

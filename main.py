@@ -7,12 +7,19 @@ screen  = curses.initscr()
 buff    = buffinput.BuffInput()
 score   = score.Score()
 wordl   = wordlist.WordList()
+buff_color = 2
 running = True
 
 def begin():
 	curses.cbreak()
 	curses.curs_set(0)
 	curses.noecho()
+	curses.start_color()
+	curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+	curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
+	curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+	curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_RED)
+	curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
 	score.reset_key_count()
 	score.reset_score()
 	score.reset_word_count()
@@ -25,7 +32,7 @@ def begin():
 	quit()
 
 def gameloop():
-	global running
+	global running, buff_color
 
 	# update values
 	wd0s = wordl.get_word(0).get_special()
@@ -43,17 +50,17 @@ def gameloop():
 	
 	# update screen
 	screen.clear()
-	if wd3s: screen.addstr(2, 2, dwd3,curses.A_REVERSE)
+	if wd3s: screen.addstr(2, 2, dwd3,curses.color_pair(3))
 	else:    screen.addstr(2, 2, dwd3)	
-	if wd2s: screen.addstr(4, 2, dwd2,curses.A_REVERSE)
+	if wd2s: screen.addstr(4, 2, dwd2,curses.color_pair(3))
 	else:    screen.addstr(4, 2, dwd2)
-	if wd1s: screen.addstr(6, 2, dwd1,curses.A_REVERSE)
+	if wd1s: screen.addstr(6, 2, dwd1,curses.color_pair(3))
 	else:    screen.addstr(6, 2, dwd1)
-	if wd0s: screen.addstr(8, 2, dwd0,curses.A_REVERSE)
+	if wd0s: screen.addstr(8, 2, dwd0,curses.color_pair(3))
 	else:    screen.addstr(8, 2, dwd0)
 	screen.addstr(1, 20, "{: >6} ({: >4}:{: >4})".format(dscr,dkct,dwct))
 	screen.addstr(2, 20, str(score.get_time_left()))
-	screen.addstr(8, 2,  dinp, curses.A_UNDERLINE)
+	screen.addstr(8, 2,  dinp, curses.color_pair(buff_color))
 	screen.refresh()
 	
 	# wait for next input
@@ -61,7 +68,7 @@ def gameloop():
 
 	# act on input
 	if   key == 27: # escape
-		running = False
+		quit()
 	elif key == 9: # tab
 		begin()
 	elif key == 32: # space
@@ -71,14 +78,16 @@ def gameloop():
 		buff.clear()
 	elif key >= 97 and key <= 122: # 'a' - 'z'
 		if wd0s:
-			score.remove_score(50)
+			score.remove_score(20)
 		buff.add(chr(key))
 		score.inc_key_count()
 		#
 		if buff.get_string() in dwd0:
 			score.add_score(2)
+			buff_color = 2
 		else:
-			score.remove_score(25)
+			score.remove_score(10)
+			buff_color = 4
 		#
 		if buff.get_string() == dwd0:
 			score.inc_word_count()

@@ -6,6 +6,7 @@ class Score:
 	word_count = 0
 	game_start_time = 0
 	game_length = 60
+	prev_scores = ""
 
 	def __init__(self): pass
 	#
@@ -14,6 +15,7 @@ class Score:
 	def remove_score(self,i):   self.value -= i
 	def inc_key_count(self):    self.key_count += 1
 	def inc_word_count(self):   self.word_count += 1
+	def add_prev_score(self,s): self.prev_scores = s + self.prev_scores
 	def check_end_game(self):
 		if self.get_game_duration() >= self.game_length:
 			return True
@@ -29,4 +31,4 @@ class Score:
 	def get_game_duration(self):return time.time() - self.game_start_time
 	def get_time_left(self):    return self.game_length - self.get_game_duration()
 	def get_word_count(self):   return self.word_count
-	#
+	def get_prev_scores(self):  return self.prev_scores

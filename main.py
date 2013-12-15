@@ -13,10 +13,15 @@ def begin():
 	curses.cbreak()
 	curses.curs_set(0)
 	curses.noecho()
+	score.reset_key_count()
+	score.reset_score()
+	score.reset_word_count()
+	wordl = wordlist.WordList()
+	buff.clear()
+	running = True
 	score.start_game()
 	while running:
 		gameloop()
-	end()
 	quit()
 
 def gameloop():
@@ -46,9 +51,9 @@ def gameloop():
 	else:    screen.addstr(6, 2, dwd1)
 	if wd0s: screen.addstr(8, 2, dwd0,curses.A_REVERSE)
 	else:    screen.addstr(8, 2, dwd0)
-	screen.addstr(1, 20, "{} ({}:{})".format(dscr,dkct,dwct))
+	screen.addstr(1, 20, "{: >6} ({: >4}:{: >4})".format(dscr,dkct,dwct))
 	screen.addstr(2, 20, str(score.get_time_left()))
-	screen.addstr(8, 2, dinp, curses.A_UNDERLINE)
+	screen.addstr(8, 2,  dinp, curses.A_UNDERLINE)
 	screen.refresh()
 	
 	# wait for next input
@@ -57,6 +62,8 @@ def gameloop():
 	# act on input
 	if   key == 27: # escape
 		running = False
+	elif key == 9: # tab
+		begin()
 	elif key == 32: # space
 		wordl.cycle()			
 		buff.clear()
@@ -64,14 +71,14 @@ def gameloop():
 		buff.clear()
 	elif key >= 97 and key <= 122: # 'a' - 'z'
 		if wd0s:
-			score.remove_score(40)
+			score.remove_score(50)
 		buff.add(chr(key))
 		score.inc_key_count()
 		#
 		if buff.get_string() in dwd0:
-			score.add_score(1)
+			score.add_score(2)
 		else:
-			score.remove_score(20)
+			score.remove_score(25)
 		#
 		if buff.get_string() == dwd0:
 			score.inc_word_count()
@@ -79,7 +86,7 @@ def gameloop():
 			buff.clear()
 		#
 		if score.check_end_game():
-			running = False
+			end()
 	else:
 		pass
 
@@ -88,21 +95,17 @@ def end():
 	dscr = score.get_score()
 	dkct = score.get_key_count()
 	dwct = score.get_word_count()
+	score.add_prev_score("{: >6} ({: >4}:{: >4})\n".format(dscr,dkct,dwct))
 	screen.clear()
-	screen.addstr(1, 1, "{} ({}:{})".format(dscr,dkct,dwct))
-	screen.refresh()
-	key = screen.getch()
-	if key == 32:
-		score.reset_key_count()
-		score.reset_score()
-		score.reset_word_count()
-		wordl = wordlist.WordList()
-		buff.clear()
-		running = True
-		begin()
-	elif   key == 27: # escape
-		pass		
-	else: end()
+	waiting = True
+	while waiting:
+		screen.addstr(1, 0, score.get_prev_scores())
+		screen.refresh()
+		key = screen.getch()
+		if key == 9: # tab
+			begin()
+		if key == 27:
+			quit()
 
 def quit():
 	"""Cleans up and exits."""

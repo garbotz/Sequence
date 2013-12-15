@@ -3,10 +3,10 @@ import worditem
 
 class WordList:
 	words = [None,None,None,None]
-	words[0] = worditem.WordItem('alpha', False)
-	words[1] = worditem.WordItem('beats', False)
-	words[2] = worditem.WordItem('furrier', False)
-	words[3] = worditem.WordItem('calvacade', False)
+	words[0] = worditem.WordItem('one', False)
+	words[1] = worditem.WordItem('two', False)
+	words[2] = worditem.WordItem('three', False)
+	words[3] = worditem.WordItem('four', False)
 
 	select = "defaults"
 	dictionary = open('data/%s.txt'%select).read().splitlines()

@@ -2,8 +2,11 @@ import random
 import worditem
 
 class WordList:
-	word_1 = worditem.WordItem('alpha', False)
-	word_0 = worditem.WordItem('beats', False)
+	words = [None,None,None,None]
+	words[0] = worditem.WordItem('alpha', False)
+	words[1] = worditem.WordItem('beats', False)
+	words[2] = worditem.WordItem('furrier', False)
+	words[3] = worditem.WordItem('calvacade', False)
 
 	select = "defaults"
 	dictionary = open('data/%s.txt'%select).read().splitlines()
@@ -12,11 +15,10 @@ class WordList:
 		pass
 
 	def cycle(self):
-		self.word_0 = self.word_1
-		self.word_1 = worditem.WordItem(random.choice(self.dictionary),random.choice([True,False,False]))
+		self.words[0] = self.words[1]
+		self.words[1] = self.words[2]
+		self.words[2] = self.words[3]
+		self.words[3] = worditem.WordItem(random.choice(self.dictionary),random.choice([True,False,False]))
 
 	def get_word(self,i):
-		if i == 0:
-			return self.word_0
-		elif i == 1:
-			return self.word_1
+		return self.words[i]

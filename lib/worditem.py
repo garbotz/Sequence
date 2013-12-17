@@ -1,16 +1,7 @@
 class WordItem:
-	string = ""
-	special = False
 
-	def __init__(self, w, s):
-		self.string = w
-		self.special = s
+	def __init__(self, string, block):
+		self.string = string
+		self.block = block
 
-	def get_string(self):
-		return self.string
-
-	def get_word(self):
-		return self
-
-	def get_special(self):
-		return self.special
+	def __len__(self): return len(self.string)

@@ -8,6 +8,7 @@ buff    = buffinput.BuffInput()
 score   = score.Score()
 wordl   = wordlist.WordList()
 buff_color = 2
+block_color = 5
 running = True
 
 def begin():
@@ -17,14 +18,14 @@ def begin():
 	curses.start_color()
 	curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
 	curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
-	curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
-	curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_RED)
+	curses.init_pair(3, curses.COLOR_RED,   curses.COLOR_BLACK)
+	curses.init_pair(4, curses.COLOR_BLUE,  curses.COLOR_RED)
 	curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
-	score.reset_key_count()
-	score.reset_score()
-	score.reset_word_count()
+	curses.init_pair(6, curses.COLOR_GREEN, curses.COLOR_BLACK)
+	curses.init_pair(7, curses.COLOR_YELLOW,curses.COLOR_BLACK)
+	score.reset()
 	wordl = wordlist.WordList()
-	buff.clear()
+	buff.reset()
 	running = True
 	score.start_game()
 	while running:
@@ -33,34 +34,20 @@ def begin():
 
 def gameloop():
 	global running, buff_color
+	words = wordl.active
 
-	# update values
-	wd0s = wordl.get_word(0).get_special()
-	dwd0 = wordl.get_word(0).get_string()
-	wd1s = wordl.get_word(1).get_special()
-	dwd1 = wordl.get_word(1).get_string()
-	wd2s = wordl.get_word(2).get_special()
-	dwd2 = wordl.get_word(2).get_string()
-	wd3s = wordl.get_word(3).get_special()
-	dwd3 = wordl.get_word(3).get_string()
-	dscr = score.get_score()
-	dkct = score.get_key_count()
-	dwct = score.get_word_count()
-	dinp = buff.get_string()
-	
 	# update screen
 	screen.clear()
-	if wd3s: screen.addstr(2, 2, dwd3,curses.color_pair(3))
-	else:    screen.addstr(2, 2, dwd3)	
-	if wd2s: screen.addstr(4, 2, dwd2,curses.color_pair(3))
-	else:    screen.addstr(4, 2, dwd2)
-	if wd1s: screen.addstr(6, 2, dwd1,curses.color_pair(3))
-	else:    screen.addstr(6, 2, dwd1)
-	if wd0s: screen.addstr(8, 2, dwd0,curses.color_pair(3))
-	else:    screen.addstr(8, 2, dwd0)
-	screen.addstr(1, 20, "{: >6} ({: >4}:{: >4})".format(dscr,dkct,dwct))
-	screen.addstr(2, 20, str(score.get_time_left()))
-	screen.addstr(8, 2,  dinp, curses.color_pair(buff_color))
+	for i,w in enumerate(words):
+		if w.block: 
+			screen.addstr(4+(i*2), 2+i, w.string, curses.color_pair(block_color))
+		else:
+			screen.addstr(4+(i*2), 2+i, w.string)
+	screen.addstr(1, 20, "({: >4}:{: >4})".format(score.key_cnt,score.word_cnt))
+	screen.addstr(2, 20, "{: >6}".format(score.value))
+	screen.addstr(3, 20, str(score.get_time_left()))
+
+	screen.addstr(4, 2,  buff.string, curses.color_pair(buff_color))
 	screen.refresh()
 	
 	# wait for next input
@@ -73,42 +60,42 @@ def gameloop():
 		begin()
 	elif key == 32: # space
 		wordl.cycle()			
-		buff.clear()
+		buff.reset()
 	elif key == 8 or key == 127: # bs, del
-		buff.clear()
+		buff.reset()
 	elif key >= 97 and key <= 122: # 'a' - 'z'
-		if wd0s:
-			score.remove_score(20)
-		buff.add(chr(key))
-		score.inc_key_count()
-		#
-		if buff.get_string() in dwd0:
-			score.add_score(2)
-			buff_color = 2
-		else:
-			score.remove_score(10)
-			buff_color = 4
-		#
-		if buff.get_string() == dwd0:
-			score.inc_word_count()
-			wordl.cycle()
-			buff.clear()
-		#
-		if score.check_end_game():
-			end()
+		key_action(key)
 	else:
 		pass
 
+def key_action(key):
+	global buff_color
+
+	buff.add(chr(key))
+	score.inc_key_count()
+	if wordl.active[0].block: # if special, remove points
+		score.remove_score(20)
+	if buff.string in wordl.active[0].string: # check validity of input against game word
+		score.add_score(2)
+		if buff_color == 4: buff_color = 2
+	else:
+		score.remove_score(10)
+		if buff_color == 2: buff_color = 4
+	if buff.get() == wordl.active[0].string: # cycle if input is correct
+		score.inc_word_count()
+		wordl.cycle()
+		buff.reset()
+	if score.check_end_game(): # check if game should be ended
+		end()	
+
 def end():
+	""" Operations for end of game. """
 	global running
-	dscr = score.get_score()
-	dkct = score.get_key_count()
-	dwct = score.get_word_count()
-	score.add_prev_score("{: >6} ({: >4}:{: >4})\n".format(dscr,dkct,dwct))
+	score.add_prev_score("{: >6} ({: >4}:{: >4})\n".format(score.value,score.key_cnt,score.word_cnt))
 	screen.clear()
 	waiting = True
 	while waiting:
-		screen.addstr(1, 0, score.get_prev_scores())
+		screen.addstr(1, 0, score.prev_scores)
 		screen.refresh()
 		key = screen.getch()
 		if key == 9: # tab

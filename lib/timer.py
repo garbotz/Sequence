@@ -1,6 +1,7 @@
 import time
 
 class Timer:
+	"""Handles round and turn/keypress timing."""
 
 	def __init__(self):
 		self.GAME_LENGTH = 60 # seconds
@@ -53,3 +54,13 @@ class Timer:
 		self.move_start = 0
 		self.speed_avg = 0
 		self.start_time = 0
+
+	def get_avg_str(self):
+		"""Returns current average speed between keypresses as a string."""
+		a = "{} ms average time between keys.".format(int(self.speed_avg * 1000))
+		return a
+
+	def get_rem_str(self):
+		"""Returns remaining round time as a string."""
+		a = "{:.3f} s".format(self.get_time_left())
+		return a

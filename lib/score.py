@@ -13,6 +13,8 @@ class Score:
 		self.key_cnt  = 0
 		self.word_cnt = 0
 		self.prev_scores = []
+		self.key_misses = 0
+		self.key_hits = 0
 
 	def add_norm(self):
 		self.value += self.val_letter
@@ -32,6 +34,12 @@ class Score:
 		else:
 			self.value = 0
 
+	def inc_misses(self):
+		self.key_misses += 1
+
+	def inc_hits(self):
+		self.key_hits += 1
+
 	def add_prev_score(self,s):
 		self.prev_scores.append(s)
 
@@ -44,7 +52,8 @@ class Score:
 	def get_cumul(self):
 		a = self.get_val_str()
 		b = self.get_cnt_str()
-		return "%s %s" % (a,b)
+		c = self.get_acc_str()
+		return "%s %s %s" % (a,b,c)
 
 	def get_val_str(self):
 		a = "Score: {:0>4}".format(self.value)
@@ -55,7 +64,13 @@ class Score:
 		b = "{:0>3}".format(self.word_cnt)
 		return "(%sc:%sw)" % (a,b)
 
+	def get_acc_str(self):
+		a = "{:0>3} err".format(self.key_misses)
+		return "(%s)" % (a)
+
 	def reset(self):
 		self.value    = 0
 		self.key_cnt  = 0
 		self.word_cnt = 0
+		self.key_misses = 0
+		self.key_hits = 0

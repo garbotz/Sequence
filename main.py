@@ -92,16 +92,20 @@ def key_action(key):
 
 	# validate input against game word
 	if word.block:
+		score.inc_misses()
 		score.err_block()
 	elif buff.string == word.string:
+		score.inc_hits()
 		score.add_word()
 		score.inc_word_count()
 		wordl.cycle()
 		buff.reset()
 	elif buff.string == word.string[:len(buff.string)]:
+		score.inc_hits()
 		score.add_norm()
 		if buff_color == 4: buff_color = 2
 	else:
+		score.inc_misses()
 		score.err_norm()
 		if buff_color == 2: buff_color = 4
 
@@ -111,7 +115,7 @@ def key_action(key):
 def end():
 	""" Operations for end of game. """
 	global running
-	scstr = "%s %s" % (score.get_cumul(),timer.get_avg_str())
+	scstr = "%s %s" % (score.get_cumul(), timer.get_avg_str())
 	score.add_prev_score(scstr)
 	screen.clear()
 	while True:

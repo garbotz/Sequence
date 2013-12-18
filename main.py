@@ -30,7 +30,7 @@ def begin():
 	wordl = wordlist.WordList()
 	buff.reset()
 	running = True
-	timer.start_game_time()
+	timer.start_round_time()
 	while running:
 		gameloop()
 	quit()
@@ -42,21 +42,22 @@ def gameloop():
 	# update screen
 	screen.clear()
 	for i,w in enumerate(words):
-		if w.block: 
+		if w.block:
 			screen.addstr(4+(i*2), 2+i, w.string, curses.color_pair(block_color))
 		else:
 			screen.addstr(4+(i*2), 2+i, w.string)
+	screen.addstr(1, 2, "{:4>}".format(score.value))
+	screen.addstr(2, 2, "{} ms".format(int(timer.speed_avg * 1000)))
+	screen.addstr(2, 10, "{:.3f} s".format(timer.get_time_left()))
 	screen.addstr(1, 20, "({: >4}:{: >4})".format(score.key_cnt,score.word_cnt))
-	screen.addstr(2, 20, "{: >6}".format(score.value))
-	screen.addstr(3, 20, str(timer.speed_avg))
-	screen.addstr(4, 20, str(timer.get_time_left()))
 
 	screen.addstr(4, 2,  buff.string, curses.color_pair(buff_color))
 	screen.refresh()
-	
+
 	# wait for next input
+	timer.turn_start()
 	key = screen.getch()
-	timer.move_time_end()
+	timer.turn_end()
 
 	# act on input
 	if   key == 27: # escape
@@ -64,12 +65,11 @@ def gameloop():
 	elif key == 9: # tab
 		begin()
 	elif key == 32: # space
-		wordl.cycle()			
+		wordl.cycle()
 		buff.reset()
 	elif key == 8 or key == 127: # bs, del
 		buff.reset()
 	elif key >= 97 and key <= 122: # 'a' - 'z'
-		timer.move_time_start()
 		key_action(key)
 	else:
 		pass
@@ -82,19 +82,23 @@ def key_action(key):
 
 	if wordl.active[0].block: # if special, remove points
 		score.err_block()
-	if buff.string in wordl.active[0].string: # check validity of input against game word
+
+	if buff.string in wordl.active[0].string: # check validity of input
 		score.add_norm()
 		if buff_color == 4: buff_color = 2
+
 	else:
 		score.err_norm()
 		if buff_color == 2: buff_color = 4
+
 	if buff.get() == wordl.active[0].string: # cycle if input is correct
 		score.add_word()
 		score.inc_word_count()
 		wordl.cycle()
 		buff.reset()
-	if timer.check_end_game(): # check if game should be ended
-		end()	
+
+	if timer.end_round_check(): # check if game should be ended
+		end()
 
 def end():
 	""" Operations for end of game. """
@@ -105,7 +109,7 @@ def end():
 		x = 0
 		while x < len(score.prev_scores):
 			screen.addstr(1+x, 0, score.prev_scores[x])
-			screen.addstr(1+x, 20, "{:.<3}".format(timer.avg_speeds[x]))
+			screen.addstr(1+x, 20, "{}".format(int(timer.avg_speeds[x]*1000)))
 			x+=1
 		screen.refresh()
 		key = screen.getch()

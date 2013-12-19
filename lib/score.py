@@ -56,7 +56,7 @@ class Score:
 		return "%s %s %s" % (a,b,c)
 
 	def get_val_str(self):
-		a = "Score: {:0>4}".format(self.value)
+		a = "{:0>4}".format(self.value)
 		return a
 
 	def get_cnt_str(self):

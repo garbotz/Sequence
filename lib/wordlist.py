@@ -12,6 +12,10 @@ class WordList:
 		self.active.append(worditem.WordItem('two',  False))
 		self.active.append(worditem.WordItem('three',False))
 		self.active.append(worditem.WordItem('four', False))
+		self.active.append(worditem.WordItem('five',  False))
+		self.active.append(worditem.WordItem('six',  False))
+		self.active.append(worditem.WordItem('seven',False))
+		self.active.append(worditem.WordItem('eight', False))
 
 	def cycle(self):
 		l = len(self.active)
@@ -32,3 +36,7 @@ class WordList:
 		self.active.append(worditem.WordItem('two',  False))
 		self.active.append(worditem.WordItem('three',False))
 		self.active.append(worditem.WordItem('four', False))
+		self.active.append(worditem.WordItem('five',  False))
+		self.active.append(worditem.WordItem('six',  False))
+		self.active.append(worditem.WordItem('seven',False))
+		self.active.append(worditem.WordItem('eight', False))

@@ -57,7 +57,7 @@ class Timer:
 
 	def get_avg_str(self):
 		"""Returns current average speed between keypresses as a string."""
-		a = "{} ms avg speed.".format(int(self.speed_avg * 1000))
+		a = "{} ms".format(int(self.speed_avg * 1000))
 		return a
 
 	def get_rem_str(self):

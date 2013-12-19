@@ -6,8 +6,7 @@ wordl   = wordlist.WordList()
 timer   = timer.Timer()
 score   = score.Score()
 buff    = buffinput.BuffInput()
-buff_color  = 2
-block_color = 3
+buff_color  = 7
 running = True
 
 def setup():
@@ -15,15 +14,25 @@ def setup():
 	curses.curs_set(0)
 	curses.noecho()
 	curses.start_color()
-	curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
-	curses.init_pair(3, curses.COLOR_RED,   curses.COLOR_BLACK)
-	curses.init_pair(4, curses.COLOR_RED,  curses.COLOR_MAGENTA)
-	curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
-	curses.init_pair(6, curses.COLOR_BLUE, curses.COLOR_WHITE)
-	curses.init_pair(7, curses.COLOR_YELLOW,curses.COLOR_BLACK)
-	curses.init_pair(8, curses.COLOR_BLACK,   curses.COLOR_RED)
-	curses.init_pair(9, curses.COLOR_WHITE,   curses.COLOR_RED)
+
+	# Normal Word in Current
+	curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK) # normal
+	# Normal Word in Standby
+	curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK) # normal
+	# Normal Word in Future
+	curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_GREEN) # block
+
+	# Block Word in Current
+	curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED) # block
+	# Block Word in Standby
+	curses.init_pair(5, curses.COLOR_RED,   curses.COLOR_RED) # block
+	# Block Word in Future
+	curses.init_pair(6, curses.COLOR_RED, curses.COLOR_RED) # block
+
+	# Input Correct
+	curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_WHITE) # block
+	# Input Incorrect
+	curses.init_pair(8, curses.COLOR_RED, curses.COLOR_WHITE) # block
 
 def run_game():
 	"""Game instance."""
@@ -41,21 +50,23 @@ def gameloop():
 
 	# update screen
 	screen.clear()
+
 	for i,w in enumerate(wordl.active):
 		if w.block:
-			if i == 1:
-				screen.addstr(4+(i), 2, w.string, curses.color_pair(8))
-			elif i == 0:
-				screen.addstr(4+(i), 2, w.string, curses.color_pair(9))
-			else:
-				screen.addstr(4+(i), 2, w.string, curses.color_pair(block_color))
-		else:
-			if i == 1:
-				screen.addstr(4+(i), 2, w.string, curses.color_pair(6))
-			elif i == 0:
+			if i == 0: # BLOCK IN CURRENT SLOT
+				screen.addstr(4+(i), 2, w.string, curses.color_pair(4))
+			elif i == 1: # BLOCK IN WAIT
 				screen.addstr(4+(i), 2, w.string, curses.color_pair(5))
-			else:
+			else: # OTHER BLOCK
+				screen.addstr(4+(i), 2, w.string, curses.color_pair(6))
+		else:
+			if i == 0: #  NORMAL IN CURRENT SLOT
 				screen.addstr(4+(i), 2, w.string, curses.color_pair(1))
+			elif i == 1: # NORMAL IN WAIT
+				screen.addstr(4+(i), 2, w.string, curses.color_pair(2))
+			else: # OTHER NORMAL
+				screen.addstr(4+(i), 2, w.string, curses.color_pair(3))
+
 	screen.addstr(1, 2,  score.get_val_str())
 	screen.addstr(1, 20, score.get_cnt_str())
 	screen.addstr(2, 2,  timer.get_avg_str())
@@ -103,11 +114,11 @@ def key_action(key):
 	elif buff.string == word.string[:len(buff.string)]:
 		score.inc_hits()
 		score.add_norm()
-		if buff_color == 4: buff_color = 2
+		if buff_color == 8: buff_color = 7
 	else:
 		score.inc_misses()
 		score.err_norm()
-		if buff_color == 2: buff_color = 4
+		if buff_color == 7: buff_color = 8
 
 	if timer.end_round_check():
 		end()
@@ -116,7 +127,8 @@ def end():
 	""" Operations for end of game. """
 	global running
 	scstr = "%s %s" % (score.get_cumul(), timer.get_avg_str())
-	score.add_prev_score(scstr)
+	wpm = "%s" % (int(score.key_cnt) / 5)
+	score.add_prev_score("%s %s" % (scstr, wpm))
 	screen.clear()
 	while True:
 		screen.addstr(1, 2, "Most recent scores:")

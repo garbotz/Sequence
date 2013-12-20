@@ -5,17 +5,13 @@ class WordList:
 	"""Handles the dictionary that game words are pulled from."""
 
 	def __init__(self):
+		self.number_words = 8
+		self.start_names = ["one","two","three","four","five","six","seven","eight"]
 		self.file = "w_any_(4-12)_(30-50)"
 		self.dictionary = open('data/'+self.file+'.txt').read().splitlines()
 		self.active = []
-		self.active.append(worditem.WordItem('one',  False))
-		self.active.append(worditem.WordItem('two',  False))
-		self.active.append(worditem.WordItem('three',False))
-		self.active.append(worditem.WordItem('four', False))
-		self.active.append(worditem.WordItem('five',  False))
-		self.active.append(worditem.WordItem('six',  False))
-		self.active.append(worditem.WordItem('seven',False))
-		self.active.append(worditem.WordItem('eight', False))
+		for n in range(self.number_words):
+			self.active.append(worditem.WordItem(self.start_names[n],False))
 
 	def cycle(self):
 		l = len(self.active)
@@ -27,16 +23,10 @@ class WordList:
 
 	def getrand(self):
 		d = random.choice(self.dictionary)
-		r = random.choice([True,False,False,False])
+		r = random.choice([True,False,False,False,False,False,False])
 		return worditem.WordItem(d,r)
 
 	def reset(self):
 		self.active[:] = []
-		self.active.append(worditem.WordItem('one',  False))
-		self.active.append(worditem.WordItem('two',  False))
-		self.active.append(worditem.WordItem('three',False))
-		self.active.append(worditem.WordItem('four', False))
-		self.active.append(worditem.WordItem('five',  False))
-		self.active.append(worditem.WordItem('six',  False))
-		self.active.append(worditem.WordItem('seven',False))
-		self.active.append(worditem.WordItem('eight', False))
+		for n in range(self.number_words):
+			self.active.append(worditem.WordItem(self.start_names[n],False))

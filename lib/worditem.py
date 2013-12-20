@@ -4,5 +4,5 @@ class WordItem:
 		self.string = string
 		self.block = block
 
-	def __len__(self): 
+	def __len__(self):
 		return len(self.string)

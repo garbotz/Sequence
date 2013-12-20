@@ -14,11 +14,11 @@ class Timer:
 
 	# Turn operations
 
-	def turn_start(self):
+	def key_start(self):
 		"Starts timing between key presses."
 		self.move_start = time.time()
 
-	def turn_end(self):
+	def key_end(self):
 		"On end of key press timing."
 		key_gap = time.time() - self.move_start
 		self.key_speeds.append(key_gap)

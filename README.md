@@ -1,5 +1,5 @@
 # Sequence
-A Python CLI rapid typing game built in curses.
+A Python CLI rapid typing game built in curses that uses word sets based on rhythmic references to keyboard physicality.
 
 # Aim
 Type as much and as accurately as possible while avoiding penalty blocks. 
